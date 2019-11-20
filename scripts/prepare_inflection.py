@@ -15,8 +15,8 @@ def preprocess(lines):
     for line in lines:
         sep = "\t"
         line = line.strip().split(sep)
-        src.append(line[2] + " " + line[0])
-        tgt.append(line[1])
+        src.append(" ".join(line[2].split(';')) + " " + " ".join(line[0]))
+        tgt.append(" ".join(line[1]))
     return src, tgt
 
 
