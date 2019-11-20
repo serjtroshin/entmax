@@ -18,7 +18,7 @@ def accuracy(pred, gold):
     ans = []
     for p, g in zip(pred, gold):
         ans.append(p == g)
-    return sum(ans) * 1.0 / len(ans)
+    return sum(ans) * 1.0 / len(ans), ans
 
 def main(args):
     with open(os.path.join(args.directory, args.data_pred), "r") as f:
@@ -28,12 +28,16 @@ def main(args):
     with open(os.path.join(args.directory, args.lang2lines), "rb") as f:
         lang2lines = pickle.load(f)
     accuracies = []
+    anses = []
     print("Languages:", lang2lines)
     for lang, (start, end) in lang2lines.items():
         predl = pred[start:end]
         goldl = gold[start:end]
-        accuracies.append(accuracy(predl, goldl))
+        acc_lang, ans = accuracy(predl, goldl)
+        accuracies.append(acc_lang)
+        anses.extend(ans)
     print(f"Accuracy for {len(lang2lines.keys())} langs = {sum(accuracies)/len(accuracies):.2f}")
+    print(f"Accuracy for all words {sum(anses) * 1.0/ len(anses):.2f}")
 
 
 if __name__=="__main__":
