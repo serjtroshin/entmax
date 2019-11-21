@@ -14,6 +14,7 @@ import traceback
 
 import onmt.utils
 from onmt.utils.logging import logger
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 
 def build_trainer(opt, device_id, model, fields, optim, model_saver=None):
@@ -218,7 +219,11 @@ class Trainer(object):
         total_stats = onmt.utils.Statistics()
         report_stats = onmt.utils.Statistics()
         self._start_report_manager(start_time=total_stats.start_time)
-
+        scheduler = ReduceLROnPlateau(
+            self.optim,
+            mode="min",
+            factor=0.5,
+            patience=0)
         for i, (batches, normalization) in enumerate(
                 self._accum_batches(train_iter)):
             step = self.optim.training_step
@@ -255,6 +260,8 @@ class Trainer(object):
                                 % (self.gpu_rank, step))
                 valid_stats = self.validate(
                     valid_iter, moving_average=self.moving_average)
+
+                scheduler.step(valid_stats.ppl())
                 if self.gpu_verbose_level > 0:
                     logger.info('GpuRank %d: gather valid stat \
                                 step %d' % (self.gpu_rank, step))
