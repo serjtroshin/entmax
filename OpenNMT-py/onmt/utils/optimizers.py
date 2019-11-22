@@ -301,7 +301,8 @@ class Optimizer(object):
     def learning_rate(self):
         """Returns the current learning rate."""
         if self._learning_rate_decay_fn is None:
-            return self._learning_rate
+             for param_group in optimizer.param_groups:
+                 return param_group['lr']
         scale = self._learning_rate_decay_fn(self._decay_step)
         return scale * self._learning_rate
 
@@ -345,7 +346,6 @@ class Optimizer(object):
         Optionally, will employ gradient modification or update learning
         rate.
         """
-        learning_rate = self.learning_rate()
         if self._fp16 == "legacy":
             if hasattr(self._optimizer, "update_master_grads"):
                 self._optimizer.update_master_grads()
@@ -354,7 +354,6 @@ class Optimizer(object):
                 self._optimizer.clip_master_grads(self._max_grad_norm)
 
         for group in self._optimizer.param_groups:
-            group['lr'] = learning_rate
             if self._fp16 is None and self._max_grad_norm > 0:
                 clip_grad_norm_(group['params'], self._max_grad_norm)
         self._optimizer.step()

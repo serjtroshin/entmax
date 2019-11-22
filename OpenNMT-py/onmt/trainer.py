@@ -220,7 +220,7 @@ class Trainer(object):
         report_stats = onmt.utils.Statistics()
         self._start_report_manager(start_time=total_stats.start_time)
         scheduler = ReduceLROnPlateau(
-            self.optim,
+            self.optim._optimizer,
             mode="min",
             factor=0.5,
             patience=0)

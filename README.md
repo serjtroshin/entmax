@@ -6,7 +6,7 @@
 `cd OpenNMT-py`
 `python setup.py install`
 
-`git submodule init`
+`git submodule update --init --recursive`
 
 ## Preprocess
 `bash scripts/prepare_data.sh`
