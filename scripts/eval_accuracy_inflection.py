@@ -17,7 +17,15 @@ parser.add_argument("--lang2lines", type=str, default="lang2lines.pkz",
 def accuracy(pred, gold):
     ans = []
     for p, g in zip(pred, gold):
+        p = p.strip().replace(" ", "")
+        g = g.strip().replace(" ", "")
+        # print(p, "|||", g)
+        p = p.replace("<space>", " ")
+        g = g.replace("<space>", " ")
         ans.append(p == g)
+        if ans[-1] == False:
+            print(p, "|||", g)
+            pass
     return sum(ans) * 1.0 / len(ans), ans
 
 def main(args):
@@ -34,6 +42,7 @@ def main(args):
         predl = pred[start:end]
         goldl = gold[start:end]
         acc_lang, ans = accuracy(predl, goldl)
+        print(lang, acc_lang)
         accuracies.append(acc_lang)
         anses.extend(ans)
     print(f"Accuracy for {len(lang2lines.keys())} langs = {sum(accuracies)/len(accuracies):.2f}")

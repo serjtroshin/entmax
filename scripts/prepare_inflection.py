@@ -10,14 +10,17 @@ parser.add_argument("--data", type=str,
 parser.add_argument("--save_to", type=str,
                     help="folder for preprocessed files")
 
+SPACE = "<space>"
 def preprocess(lines):
     src = []
     tgt = []
     for line in lines:
         sep = "\t"
         line = line.strip().split(sep)
-        src.append(" ".join(line[2].split(';')) + " " + " ".join(line[0]))
-        tgt.append(" ".join(line[1]))
+        new_src = "$".join(line[2].split(';')).replace(" ", SPACE) + "$<sep>$" + "$".join(line[0]).replace(" ", SPACE)
+        src.append(new_src.replace("$", " "))
+        new_tgt = "$".join(line[1]).replace(" ", SPACE)
+        tgt.append(new_tgt.replace("$", " "))
     return src, tgt
 
 
@@ -29,6 +32,7 @@ def main(args):
                     file_train = args.data + lang +  "-train-" + quantity
                     if not os.path.isfile(file_train):
                         continue
+                    print("file_train:", file_train)
                     lines = [line.strip() for line in codecs.open(file_train, "r", encoding="utf-8")]
                     src, tgt = preprocess(lines)
                     for line in src:
@@ -43,9 +47,10 @@ def main(args):
         with open(args.save_to + "high.dev.tgt", "w", encoding="utf-8") as f_tgt:
             for lang in sorted(list({re.sub('\-train.*$','',d) for d in os.listdir(args.data) if '-train-' in d})):
                 start = line_cnt
-                file_name = args.data + lang +  "-train-" + quantity
+                file_name = args.data + lang +  "-dev"
                 if not os.path.isfile(file_name):
                     continue
+                print("file_dev:", file_name)
                 lines = [line.strip() for line in codecs.open(args.data + lang + "-dev", "r", encoding="utf-8")]
                 end = start + len(lines)
                 src, tgt = preprocess(lines)

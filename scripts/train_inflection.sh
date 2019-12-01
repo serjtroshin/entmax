@@ -3,6 +3,7 @@ cd OpenNMT-py
 dir="../"
 onmt_train -data $dir/data/demo \
 --gpu_ranks 0 \
+--world_size 1 \
 --enc_rnn_size 300 \
 --dec_rnn_size 300 \
 --src_word_vec_size 300 \
