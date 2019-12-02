@@ -193,9 +193,9 @@ class GlobalAttention(nn.Module):
         elif self.attn_func == "entmax_bisect":
             align_vectors = entmax_bisect(
                 align.view(batch*target_l, source_l),
-                dim=-1,
-                alpha=self.entmax_alpha,
-                iters=self.entmax_bisect_iters)
+                -1,
+                self.entmax_alpha,
+                self.entmax_bisect_iters)
 
         align_vectors = align_vectors.view(batch, target_l, source_l)
 

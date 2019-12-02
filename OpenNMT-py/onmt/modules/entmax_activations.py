@@ -51,7 +51,7 @@ class EntmaxBisectionFunction(Function):
         s_l1 = s.sum(ctx.dim)
         g_ss_t_div_s_l1 = (g_diag_s.sum(ctx.dim) / s_l1).unsqueeze(ctx.dim) * s
         d = g_diag_s - g_ss_t_div_s_l1
-        return d, None, None
+        return d, None, None, None
 
 entmax_bisect = EntmaxBisectionFunction.apply
 
