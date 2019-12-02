@@ -30,6 +30,33 @@ def _bisection(z, alpha, dim=0, iters=100):
     return p / Z.unsqueeze(1)
 
 
+def _entmax15(z):
+    # z: [batch_size, d]
+    z, indices = torch.sort(z, descending=True)
+    _, rev_indices = torch.sort(indices, descending=False)
+    z = z / 2.0
+    bs = z.shape[0]
+    d = z.shape[-1]
+    z_cum = torch.cumsum(z, dim=1)
+    p_star = torch.ones_like(z) * (-1)
+    # history = [] # for debug only
+    
+    for p in range(d):
+        m_p = z_cum[:,p] / (p + 1)
+        s_p = torch.cumsum((z - m_p.unsqueeze(1))**2, dim=-1)[:,p]
+        t_p = m_p - (1.0/(p + 1.0) * (1.0 - s_p))**0.5
+        if p == d - 1:
+            p_star = torch.where(p_star == -1, (F.relu(z - t_p.unsqueeze(1)))**2, p_star)
+        else:
+            p_star = torch.where(((z[:,p+1] <= t_p) & (t_p <= z[:,p])).unsqueeze(1), 
+                             (F.relu(z - t_p.unsqueeze(1)))**2, 
+                              p_star)
+            # history.append(((z[:,p+1] <= t_p) & (t_p <= z[:,p])).unsqueeze(1))
+    
+    assert torch.all(torch.cat(history, 1).sum(1) <= 1).item() == True # for debug only (test that we don't need break)
+    return torch.gather(p_star, dim=1, index=rev_indices)
+    
+
 class EntmaxBisectionFunction(Function):
 
     @staticmethod
