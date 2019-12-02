@@ -33,7 +33,7 @@ def _bisection(z, alpha, dim=0, iters=100):
 class EntmaxBisectionFunction(Function):
 
     @staticmethod
-    def forward(ctx, input, dim=0, alpha=1.3, iters=100):
+    def forward(ctx, input, dim=1, alpha=1.5, iters=100):
         p_star = _bisection(input, alpha=alpha, dim=dim, iters=iters)
         ctx.save_for_backward(p_star)
         ctx.dim = dim
@@ -54,3 +54,16 @@ class EntmaxBisectionFunction(Function):
         return d, None, None
 
 entmax_bisect = EntmaxBisectionFunction.apply
+
+
+if __name__ == "__main__":
+    import numpy as np
+    tensor = torch.tensor(
+        np.array([[0.1, 0.1, 0.8],
+                 [0.8, 0.1, 0.1],
+                 [0.5, 0.4, 0.1],
+                 [0.33, 0.34, 0.33],
+                 [1.0, 0.0, 0.0]])
+        )
+
+    print(entmax_bisect(tensor, -1, 1.5, 100))
