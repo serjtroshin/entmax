@@ -17,7 +17,7 @@ def preprocess(lines):
     for line in lines:
         sep = "\t"
         line = line.strip().split(sep)
-        new_src = "$".join(line[2].split(';')).replace(" ", SPACE) + "$<sep>$" + "$".join(line[0]).replace(" ", SPACE)
+        new_src = "$".join(line[2].split(';')).replace(" ", SPACE) + "$#$" + "$".join(line[0]).replace(" ", SPACE)
         src.append(new_src.replace("$", " "))
         new_tgt = "$".join(line[1]).replace(" ", SPACE)
         tgt.append(new_tgt.replace("$", " "))

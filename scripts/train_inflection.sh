@@ -13,4 +13,8 @@ onmt_train -data $dir/data/demo \
 --train_steps 130000 \
 --batch_size 64 \
 --valid_steps 10000 \
+--global_attention_function entmax_bisect \
+--entmax_alpha 1.5 \
+--entmax_bisect_iters 20 \
+--encoder_type brnn \
 --save_model $dir/models/model ${@:1}
