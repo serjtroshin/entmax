@@ -138,7 +138,7 @@ def model_opts(parser):
     group.add('--global_attention_function', '-global_attention_function',
               type=str, default="softmax", choices=["softmax", "sparsemax", "entmax_bisection", "entmax15"])
     group.add('--entmax_alpha', '-entmax_alpha',
-               type=float, default=1.6)
+               type=float, default=1.5)
     group.add('--entmax_iters', '-entmax_iters',
                type=int, default=100)
     group.add('--self_attn_type', '-self_attn_type',

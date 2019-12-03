@@ -25,7 +25,6 @@ class EntmaxLossFunction(Function):
         elif entmax_type == 'entmax15':
             p_star = entmax15(input, dim)
             assert alpha == 1.5
-
         target_onehot = F.one_hot(target, input.size(-1))
         loss = (
             torch.sum((p_star - target_onehot) * input, dim=dim)
@@ -33,12 +32,12 @@ class EntmaxLossFunction(Function):
             torch.sum(p_star - p_star ** alpha, dim=dim) / (alpha * (alpha - 1.0))
         )
         ctx.save_for_backward(target_onehot, p_star)
+
         return loss
 
     @staticmethod
     def backward(ctx, grad_output):
         target, p_star = ctx.saved_tensors
-
         return p_star - target, None, None, None, None, None
 
 
@@ -67,9 +66,10 @@ class EntmaxLoss(nn.Module):
         loss = entmax_loss(input, target,
             -1,
             self.alpha,
-            'entmax15',
+            self.entmax_type,
             self.iters
         )
+
         if self.ignore_index >= 0:
             ignored_positions = target == self.ignore_index
             size = float((target.size(0) - ignored_positions.sum()).item())

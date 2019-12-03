@@ -78,7 +78,7 @@ class GlobalAttention(nn.Module):
             "Please select a valid attention type (got {:s}).".format(
                 attn_type))
         self.attn_type = attn_type
-        assert attn_func in ["softmax", "sparsemax", "entmax_bisect"], (
+        assert attn_func in ["softmax", "sparsemax", "entmax_bisection"], (
             "Please select a valid attention function.")
         self.attn_func = attn_func
         self.entmax_alpha = entmax_alpha
