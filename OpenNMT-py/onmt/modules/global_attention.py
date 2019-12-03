@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from onmt.modules.sparse_activations import sparsemax
-from onmt.modules.entmax_activations import entmax_bisect
+from onmt.modules.entmax_activations import entmax_bisect, entmax_15_exact
 from onmt.utils.misc import aeq, sequence_mask
 
 # This class is mainly used by decoder.py for RNNs but also
@@ -70,7 +70,7 @@ class GlobalAttention(nn.Module):
     """
 
     def __init__(self, dim, coverage=False, attn_type="dot",
-                 attn_func="softmax", entmax_alpha=1.6, entmax_bisect_iters=100):
+                 attn_func="softmax", entmax_alpha=1.6, entmax_iters=100):
         super(GlobalAttention, self).__init__()
 
         self.dim = dim
@@ -82,7 +82,7 @@ class GlobalAttention(nn.Module):
             "Please select a valid attention function.")
         self.attn_func = attn_func
         self.entmax_alpha = entmax_alpha
-        self.entmax_bisect_iters = entmax_bisect_iters
+        self.entmax_iters = entmax_iters
 
         if self.attn_type == "general":
             self.linear_in = nn.Linear(dim, dim, bias=False)
@@ -190,12 +190,16 @@ class GlobalAttention(nn.Module):
             align_vectors = F.softmax(align.view(batch*target_l, source_l), -1)
         elif self.attn_func == "sparsemax":
             align_vectors = sparsemax(align.view(batch*target_l, source_l), -1)
-        elif self.attn_func == "entmax_bisect":
+        elif self.attn_func == "entmax_bisection":
             align_vectors = entmax_bisect(
                 align.view(batch*target_l, source_l),
                 -1,
                 self.entmax_alpha,
-                self.entmax_bisect_iters)
+                self.entmax_iters)
+        elif self.attn_func == "entmax15":
+            align_vectors = entmax_15_exact(
+                align.view(batch*target_l, source_l),
+                -1)
 
         align_vectors = align_vectors.view(batch, target_l, source_l)
 

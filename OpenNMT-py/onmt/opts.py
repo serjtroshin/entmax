@@ -136,10 +136,10 @@ def model_opts(parser):
               help="The attention type to use: "
                    "dotprod or general (Luong) or MLP (Bahdanau)")
     group.add('--global_attention_function', '-global_attention_function',
-              type=str, default="softmax", choices=["softmax", "sparsemax", "entmax_bisect"])
+              type=str, default="softmax", choices=["softmax", "sparsemax", "entmax_bisection", "entmax15"])
     group.add('--entmax_alpha', '-entmax_alpha',
                type=float, default=1.6)
-    group.add('--entmax_bisect_iters', '-entmax_bisect_iters',
+    group.add('--entmax_iters', '-entmax_iters',
                type=int, default=100)
     group.add('--self_attn_type', '-self_attn_type',
               type=str, default="scaled-dot",
@@ -167,10 +167,12 @@ def model_opts(parser):
               help="The copy attention type to use. Leave as None to use "
                    "the same as -global_attention.")
     group.add('--generator_function', '-generator_function', default="softmax",
-              choices=["softmax", "sparsemax"],
+              choices=["softmax", "sparsemax", "entmax15", "entmax_bisection"],
               help="Which function to use for generating "
                    "probabilities over the target vocabulary (choices: "
                    "softmax, sparsemax)")
+    group.add('--generator_entmax_iters', '-generator_entmax_iters', default=100, type=int)
+    group.add('--generator_entmax_alpha', '-generator_entmax_alpha', default=1.5, type=float)
     group.add('--copy_attn_force', '-copy_attn_force', action="store_true",
               help='When available, train to copy.')
     group.add('--reuse_copy_attn', '-reuse_copy_attn', action="store_true",
