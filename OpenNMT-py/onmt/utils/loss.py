@@ -9,7 +9,9 @@ import torch.nn.functional as F
 
 import onmt
 from onmt.modules.sparse_losses import SparsemaxLoss
+from onmt.modules.entmax_losses import EntmaxLoss
 from onmt.modules.sparse_activations import LogSparsemax
+from onmt.modules.entmax_activations import LogEntmax15, LogEntmaxBisect
 
 
 def build_loss_compute(model, tgt_field, opt, train=True):
@@ -41,6 +43,14 @@ def build_loss_compute(model, tgt_field, opt, train=True):
         )
     elif isinstance(model.generator[-1], LogSparsemax):
         criterion = SparsemaxLoss(ignore_index=padding_idx, reduction='sum')
+    elif isinstance(model.generator[-1], LogEntmaxBisect) or isinstance(model.generator[-1], LogEntmax15):
+        criterion = EntmaxLoss(
+            ignore_index=padding_idx,
+            reduction='sum',
+            alpha=opt.generator_entmax_alpha,
+            iters=opt.generator_entmax_iters,
+            entmax_type=opt.generator_function,
+        )
     else:
         criterion = nn.NLLLoss(ignore_index=padding_idx, reduction='sum')
 
@@ -48,7 +58,7 @@ def build_loss_compute(model, tgt_field, opt, train=True):
     # probabilities, only the first part of the generator needs to be
     # passed to the NMTLossCompute. At the moment, the only supported
     # loss function of this kind is the sparsemax loss.
-    use_raw_logits = isinstance(criterion, SparsemaxLoss)
+    use_raw_logits = isinstance(criterion, SparsemaxLoss) or isinstance(criterion, EntmaxLoss)
     loss_gen = model.generator[0] if use_raw_logits else model.generator
     if opt.copy_attn:
         compute = onmt.modules.CopyGeneratorLossCompute(

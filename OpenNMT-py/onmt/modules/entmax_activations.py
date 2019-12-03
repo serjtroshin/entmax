@@ -1,71 +1,9 @@
 import torch
-from torch.autograd import Function
 import torch.nn as nn
+from onmt.modules.entmax_utils import bisection, entmax15
+from torch.autograd import Function
 
-
-def _bisection(z, alpha, dim=0, iters=100):
-    pow_exp = 1.0 / (alpha - 1.0)
-
-    def _p(z, tau):
-        return torch.pow(
-            torch.clamp(z - tau, min=0.0),
-            exponent=pow_exp)
-
-    d = float(z.size(dim))
-    z = (alpha - 1.0) * z.clone()
-    z_max_value, _ = torch.max(z, dim=dim, keepdim=True)
-    tau_min = z_max_value - 1.0
-    tau_max = z_max_value - d ** (1 - alpha)
-
-    p = None
-    Z = None
-    for _ in range(iters):
-        tau = (tau_min + tau_max) / 2.0
-        p = _p(z, tau)
-        Z = p.sum(dim)
-        mask = Z < 1.0
-        tau_max[mask] = tau[mask]
-        tau_min[~mask] = tau[~mask]
-
-    return p / Z.unsqueeze(1)
-
-
-def _entmax15(z):
-    # z: [batch_size, d]
-    z, indices = torch.sort(z, descending=True)
-    _, rev_indices = torch.sort(indices, descending=False)
-    z = z / 2.0
-    bs = z.shape[0]
-    d = z.shape[-1]
-    z_cum = torch.cumsum(z, dim=1)
-    p_star = torch.ones_like(z) * (-1)
-    # history = [] # for debug only
-    
-    for p in range(d):
-        m_p = z_cum[:,p] / (p + 1)
-        s_p = torch.cumsum((z - m_p.unsqueeze(1))**2, dim=-1)[:,p]
-        t_p = m_p - (1.0/(p + 1.0) * (1.0 - s_p))**0.5
-        if p == d - 1:
-            p_star = torch.where(p_star == -1, (F.relu(z - t_p.unsqueeze(1)))**2, p_star)
-        else:
-            p_star = torch.where(((z[:,p+1] <= t_p) & (t_p <= z[:,p])).unsqueeze(1), 
-                             (F.relu(z - t_p.unsqueeze(1)))**2, 
-                              p_star)
-            # history.append(((z[:,p+1] <= t_p) & (t_p <= z[:,p])).unsqueeze(1))
-    
-    assert torch.all(torch.cat(history, 1).sum(1) <= 1).item() == True # for debug only (test that we don't need break)
-    return torch.gather(p_star, dim=1, index=rev_indices)
-    
-
-class EntmaxBisectionFunction(Function):
-
-    @staticmethod
-    def forward(ctx, input, dim=1, alpha=1.5, iters=100):
-        p_star = _bisection(input, alpha=alpha, dim=dim, iters=iters)
-        ctx.save_for_backward(p_star)
-        ctx.dim = dim
-        ctx.alpha = alpha
-        return p_star
+class EntmaxBaseFunction(Function):
 
     @staticmethod
     def backward(ctx, grad_output):
@@ -80,17 +18,50 @@ class EntmaxBisectionFunction(Function):
         d = g_diag_s - g_ss_t_div_s_l1
         return d, None, None, None
 
+
+class EntmaxBisectionFunction(EntmaxBaseFunction):
+
+    @staticmethod
+    def forward(ctx, input, dim=-1, alpha=1.5, iters=100):
+        p_star = bisection(input, alpha=alpha, dim=dim, iters=iters)
+        ctx.save_for_backward(p_star)
+        ctx.dim = dim
+        ctx.alpha = alpha
+        return p_star
+
+
+class Entmax15Function(EntmaxBaseFunction):
+
+    @staticmethod
+    def forward(ctx, input, dim=-1):
+        p_star = entmax15(input, dim)
+        ctx.save_for_backward(p_star)
+        ctx.dim = dim
+        ctx.alpha = 1.5
+        return p_star
+
+
+class LogEntmax15(nn.Module):
+
+    def __init__(self, dim=-1):
+        self.dim = dim
+        super(LogEntmax15, self).__init__()
+
+    def forward(self, input):
+        return torch.log(entmax_15_exact(input, self.dim))
+
+
+class LogEntmaxBisect(nn.Module):
+
+    def __init__(self, dim=-1, iters=100, alpha=1.5):
+        self.dim = dim
+        self.iters = iters
+        self.alpha = alpha
+        super(LogEntmaxBisect, self).__init__()
+
+    def forward(self, input):
+        return torch.log(entmax_bisect(input, self.dim, self.alpha, self.iters))
+
+
 entmax_bisect = EntmaxBisectionFunction.apply
-
-
-if __name__ == "__main__":
-    import numpy as np
-    tensor = torch.tensor(
-        np.array([[0.1, 0.1, 0.8],
-                 [0.8, 0.1, 0.1],
-                 [0.5, 0.4, 0.1],
-                 [0.33, 0.34, 0.33],
-                 [1.0, 0.0, 0.0]])
-        )
-
-    print(entmax_bisect(tensor, -1, 1.5, 100))
+entmax_15_exact = Entmax15Function.apply
