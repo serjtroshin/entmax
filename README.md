@@ -10,3 +10,14 @@
 
 ## Preprocess
 `bash scripts/prepare_data.sh`
+
+## Train
+`bash scripts/train_inflection.sh`
+
+## Translate
+`bash scripts/translate_inflection.sh`
+
+## Eval Quality
+`bash scripts/eval_accuracy_inflection.sh`
+
+
