@@ -39,7 +39,7 @@ def main(args):
                         f_src.write(f"{lang} " + line)
                         f_src.write("\n")
                     for line in tgt:
-                        f_tgt.write(f"{lang} " + line)
+                        f_tgt.write(line)
                         f_tgt.write("\n")
     languages2lines = {}
     line_cnt = 0
@@ -58,7 +58,7 @@ def main(args):
                     f_src.write(f"{lang} " + line)
                     f_src.write("\n")
                 for line in tgt:
-                    f_tgt.write(f"{lang} " + line)
+                    f_tgt.write(line)
                     f_tgt.write("\n")
                 line_cnt += len(lines)
                 languages2lines[lang] = (start, end)
