@@ -1,5 +1,6 @@
 de-en/
 data/
+test/
 *.pyc
 *.model
 *model*.pt
