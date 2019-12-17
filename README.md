@@ -13,10 +13,14 @@
 `git submodule update --init --recursive`
 
 ## Preprocess MORPH
-`bash scripts/prepare_data.sh`
+`bash scripts/prepare_data.sh high`
+`bash scripts/prepare_data.sh medium`
 
 ## MORPH experiments
-Run experiment `bash scripts/experiment_pipe.sh <task-type> <exp-name> <activation-alpha> <generator-alpha> <gpu-id> <epochs num [8 by default]>`
+Run experiment like:
+`bash scripts/experiment_pipe.sh <task-type> <exp-name> <activation-alpha> <generator-alpha> <gpu-id> <epochs num [8 by default]>`
+
+Example:
 `bash scripts/experiment_pipe.sh medium test 1.5 1.5 0 8`
 
 ## Preprocess IWSLT
