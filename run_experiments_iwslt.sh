@@ -1,12 +1,16 @@
 pip install sacrebleu sacremoses subword-nmt
-att="softmax"
-gen="softmax"
-model="model_iwslt.de-en.$att."$gen"_step_100000.pt"
+att="entmax_bisection"
+gen="entmax_bisection"
+d=0
 if [ ! -d de-en ]; then
-bash scripts/get_data.sh
-bash scripts/tokenize_iwslt.sh
+cd scripts/
+bash get_iwslt.sh
+bash tokenize_iwslt.sh
+cd ..
 bash scripts/prepare_iwslt.sh de en
 fi
-bash scripts/train_iwslt.sh de en $att $gen
-bash scripts/translate_iwslt.sh de en $model
-bash scripts/detokenize_iwslt.sh de en $model
+for att in 1.5 2.0
+do
+CUDA_VISIBLE_DEVICES=$d bash run_experiment.sh $att &
+d=$((d + 1))
+done
