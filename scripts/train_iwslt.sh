@@ -5,6 +5,8 @@ tgt=$2
 pair="$1-$2"
 attention_fn=$3
 generator_fn=$4
+att_alpha=$5
+gen_alpha=$6
 echo "$pair $attention_fn $generator_fn"
 
 python train.py -data $dir/data/iwlst.$pair \
@@ -21,5 +23,7 @@ python train.py -data $dir/data/iwlst.$pair \
 --valid_steps 10000 \
 --global_attention_function $attention_fn \
 --generator_function $generator_fn \
+--entmax_alpha $att_alpha \
+--generator_entmax_alpha $gen_alpha \
 --encoder_type brnn \
---save_model $dir/models/model_iwslt.$src-$tgt.$attention_fn.$generator_fn
+--save_model $dir/models/model_iwslt.$src-$tgt.$attention_fn.$generator_fn.$att_alpha.$gen_alpha
