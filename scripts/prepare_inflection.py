@@ -9,6 +9,8 @@ parser.add_argument("--data", type=str,
                     help="folder with *-train-* files")
 parser.add_argument("--save_to", type=str,
                     help="folder for preprocessed files")
+parser.add_argument("--mode", type=str, default='high',
+		    help="high or medium")
 
 SPACE = "<space>"
 def preprocess(lines):
@@ -25,10 +27,11 @@ def preprocess(lines):
 
 
 def main(args):
-    with open(args.save_to + "high.train.src", "w", encoding="utf-8") as f_src:
-        with open(args.save_to + "high.train.tgt", "w", encoding="utf-8") as f_tgt:
+    mode = args.mode
+    with open(args.save_to + f"{mode}.train.src", "w", encoding="utf-8") as f_src:
+        with open(args.save_to + f"{mode}.train.tgt", "w", encoding="utf-8") as f_tgt:
             for lang in sorted(list({re.sub('\-train.*$','',d) for d in os.listdir(args.data) if '-train-' in d})):
-                for quantity in ['high']:
+                for quantity in [mode]:
                     file_train = args.data + lang +  "-train-" + quantity
                     if not os.path.isfile(file_train):
                         continue
@@ -43,8 +46,8 @@ def main(args):
                         f_tgt.write("\n")
     languages2lines = {}
     line_cnt = 0
-    with open(args.save_to + "high.dev.src", "w", encoding="utf-8") as f_src:
-        with open(args.save_to + "high.dev.tgt", "w", encoding="utf-8") as f_tgt:
+    with open(args.save_to + f"{mode}.dev.src", "w", encoding="utf-8") as f_src:
+        with open(args.save_to + f"{mode}.dev.tgt", "w", encoding="utf-8") as f_tgt:
             for lang in sorted(list({re.sub('\-train.*$','',d) for d in os.listdir(args.data) if '-train-' in d})):
                 start = line_cnt
                 file_name = args.data + lang +  "-dev"

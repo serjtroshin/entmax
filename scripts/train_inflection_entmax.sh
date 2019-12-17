@@ -1,7 +1,10 @@
-task_type="high"
+task_type=${1:-"high"}
+steps=${2:-80000}
+val_steps=${3:-10000}
 cd OpenNMT-py
-python setup.py install
 dir="../"
+python3.6 setup.py install
+
 onmt_train -data $dir/data/demo \
 --gpu_ranks 0 \
 --world_size 1 \
@@ -11,10 +14,10 @@ onmt_train -data $dir/data/demo \
 --tgt_word_vec_size 300 \
 --learning_rate 0.001 \
 --optim adam \
---train_steps 130000 \
+--train_steps $steps \
 --batch_size 64 \
---valid_steps 10000 \
+--valid_steps $val_steps \
 --global_attention_function entmax15 \
 --generator_function entmax15 \
 --encoder_type brnn \
---save_model $dir/models/model ${@:1}
+--save_model $dir/models/model

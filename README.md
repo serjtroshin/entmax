@@ -15,6 +15,10 @@
 ## Preprocess MORPH
 `bash scripts/prepare_data.sh`
 
+## MORPH experiments
+Run experiment `bash scripts/experiment_pipe.sh <task-type> <exp-name> <activation-alpha> <generator-alpha> <gpu-id> <epochs num [8 by default]>`
+`bash scripts/experiment_pipe.sh medium test 1.5 1.5 0 8`
+
 ## Preprocess IWSLT
 
 `cd scripts`
