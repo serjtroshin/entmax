@@ -1,6 +1,7 @@
-att="entmax_bisection"
-gen="entmax_bisection"
-coef=$1
+fn=$1
+att="$fn"
+gen="$fn"
+coef=$2
 att_alpha=$coef
 gen_alpha=$coef
 num_steps=100000
