@@ -20,7 +20,7 @@ echo "Data size $data_size"
 echo "Training steps $train_steps"
 echo "Val steps $val_steps"
 
-onmt_train -data $dir/data/demo \
+onmt_train -data $dir/data/data.$task_type \
 --gpu_ranks $gpu_id \
 --world_size 1 \
 --enc_rnn_size 300 \

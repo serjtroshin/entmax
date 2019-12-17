@@ -6,4 +6,4 @@ python3.6 scripts/prepare_inflection.py --data $inflection_dir --save_to $target
 cd OpenNMT-py
 
 onmt_preprocess -train_src $dir/data/$task_type.train.src -train_tgt $dir/data/$task_type.train.tgt \
--valid_src $dir/data/$task_type.dev.src -valid_tgt $dir/data/$task_type.dev.tgt -overwrite -save_data $dir/data/demo
+-valid_src $dir/data/$task_type.dev.src -valid_tgt $dir/data/$task_type.dev.tgt -overwrite -save_data $dir/data/data.$task_type
