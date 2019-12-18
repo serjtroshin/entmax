@@ -13,4 +13,4 @@ sacremoses detruecase -j 8 < $dir/data/$pred.debpe > $dir/data/$pred.debpe.detru
 
 sacremoses detokenize -j 8 -l $tgt < $dir/data/$pred.debpe.detrue > $dir/data/$pred.debpe.detrue.detok
 
-cat $dir/data/$pred.debpe.detrue.detok | sacrebleu $DATA_DIR/test.$pair.$tgt
+cat $dir/data/$pred.debpe.detrue.detok | sacrebleu $DATA_DIR/test.$pair.$tgt > $dir/logs/$pred.bleu
