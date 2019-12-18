@@ -15,13 +15,12 @@ let train_steps=$epochs*$epoch_steps
 val_steps=$epoch_steps
 
 cd OpenNMT-py
-python3.6 setup.py install
 echo "Data size $data_size"
 echo "Training steps $train_steps"
 echo "Val steps $val_steps"
 
-onmt_train -data $dir/data/data.$task_type \
---gpu_ranks $gpu_id \
+CUDA_VISIBLE_DEVICES=$gpu_id python train.py -data $dir/data/data.$task_type \
+--gpu_ranks 0 \
 --world_size 1 \
 --enc_rnn_size 300 \
 --dec_rnn_size 300 \
