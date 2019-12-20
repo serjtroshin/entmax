@@ -1,5 +1,5 @@
 # entmax
-Implementation of the parer [Sparse Sequence-to-Sequence Models](https://arxiv.org/pdf/1905.05702v2.pdf) 
+Implementation of the paper [Sparse Sequence-to-Sequence Models](https://arxiv.org/pdf/1905.05702v2.pdf) 
 ### Install
 ```
 conda create --name entmax36 python=3.6
