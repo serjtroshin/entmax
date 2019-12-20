@@ -1,4 +1,4 @@
-# \alpha-entmax
+# $\alpha$-entmax
 ### Install
 ```
 conda create --name entmax36 python=3.6
