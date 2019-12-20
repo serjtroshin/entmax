@@ -13,19 +13,19 @@ parser.add_argument("--data_pred", type=str, default="pred.txt",
                     help="file with predicted data")
 parser.add_argument("--lang2lines", type=str, default="lang2lines.pkz",
                     help="matching between languages and lines in files")
-    
-def accuracy(pred, gold):
+parser.add_argument("--verbose", action='store_true',
+                    help="print wrong predictions")
+
+def accuracy(pred, gold, verbose=False):
     ans = []
     for p, g in zip(pred, gold):
         p = p.strip().replace(" ", "")
         g = g.strip().replace(" ", "")
-        # print(p, "|||", g)
         p = p.replace("<space>", " ")
         g = g.replace("<space>", " ")
         ans.append(p == g)
-        if ans[-1] == False:
-            print(p, "|||", g)
-            pass
+        if verbose and not ans[-1]:
+            print(p, "!=", g)
     return sum(ans) * 1.0 / len(ans), ans
 
 def main(args):
@@ -41,7 +41,7 @@ def main(args):
     for lang, (start, end) in lang2lines.items():
         predl = pred[start:end]
         goldl = gold[start:end]
-        acc_lang, ans = accuracy(predl, goldl)
+        acc_lang, ans = accuracy(predl, goldl, args.verbose)
         print(lang, acc_lang)
         accuracies.append(acc_lang)
         anses.extend(ans)

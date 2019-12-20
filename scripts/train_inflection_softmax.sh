@@ -13,9 +13,9 @@ let train_steps=$epochs*$epoch_steps
 val_steps=$epoch_steps
 
 cd OpenNMT-py
-echo "Data size:\t$data_size"
-echo "Training steps:\t$train_steps"
-echo "Val steps:\t$val_steps"
+echo "Data size $data_size"
+echo "Training steps $train_steps"
+echo "Val steps $val_steps"
 
 CUDA_VISIBLE_DEVICES=$gpu_id python3.6 train.py -data $dir/data/data.$task_type \
 --gpu_ranks 0 \
@@ -30,6 +30,6 @@ CUDA_VISIBLE_DEVICES=$gpu_id python3.6 train.py -data $dir/data/data.$task_type 
 --valid_steps $val_steps \
 --encoder_type brnn \
 --batch_size 64 \
---global_attention_function entmax15 \
---generator_function entmax15 \
+--global_attention_function softmax \
+--generator_function softmax \
 --save_model $dir/$exp_dir/models/model

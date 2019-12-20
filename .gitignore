@@ -4,3 +4,5 @@ test/
 *.pyc
 *.model
 *model*.pt
+.tmp/
+scripts/.tmp/

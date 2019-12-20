@@ -19,7 +19,7 @@ echo "Data size $data_size"
 echo "Training steps $train_steps"
 echo "Val steps $val_steps"
 
-CUDA_VISIBLE_DEVICES=$gpu_id python train.py -data $dir/data/data.$task_type \
+CUDA_VISIBLE_DEVICES=$gpu_id python3.6 train.py -data $dir/data/data.$task_type \
 --gpu_ranks 0 \
 --world_size 1 \
 --enc_rnn_size 300 \
